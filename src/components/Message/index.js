@@ -12,12 +12,14 @@ const Message = ({message}) => {
   }
 
   return (
-    <View style={[styles.container, 
+    <View 
+    style={[styles.container, 
       {
         backgroundColor:isMyMessage() ? '#DCF8C5' : 'white',
         alignSelf: isMyMessage() ? 'flex-end' : 'flex-start'
       }
-    ]}> 
+    ]}
+    > 
       <Text>{message.text}</Text>
       <Text style={styles.time}>{dayjs(message.createdAt).fromNow(true)}</Text>
     </View>
@@ -33,6 +35,16 @@ const styles = StyleSheet.create( {
     padding: 10,
     borderRadius: 10,
     maxWidth: '80%',
+
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,    
+    elevation: 5,
+    
   },
   time: {
       color: 'gray',
