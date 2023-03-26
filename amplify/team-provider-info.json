@@ -1,0 +1,20 @@
+{
+  "staging": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-famchat-staging-140810-authRole",
+      "UnauthRoleArn": "arn:aws:iam::737006151001:role/amplify-famchat-staging-140810-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::737006151001:role/amplify-famchat-staging-140810-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-famchat-staging-140810-deployment",
+      "UnauthRoleName": "amplify-famchat-staging-140810-unauthRole",
+      "StackName": "amplify-famchat-staging-140810",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:737006151001:stack/amplify-famchat-staging-140810/4f6bf0c0-ca4d-11ed-8ecb-060969f99a96",
+      "AmplifyAppId": "d2ctflroa1t1ac"
+    },
+    "categories": {
+      "auth": {
+        "famChat": {}
+      }
+    }
+  }
+}
