@@ -11,10 +11,7 @@ dayjs.extend(relativeTime);
 const ChatListItem = ( {chat} ) => {  
   const [user, setUser] = useState();
   const navigation = useNavigation();
-  console.log ("=================================" )
-  console.log ( chat.users.items.map( item => item.user.id) )
-  console.log ( chat )
-  console.log ("=================================" )
+  
 
 
 
@@ -49,9 +46,14 @@ const ChatListItem = ( {chat} ) => {
       <View style={styles.content}>
         <View style={styles.row}>
           <Text numberOfLines={1} style={styles.name}>{user?.name}</Text>
-          <Text style={styles.subTitle}>
+          
+          { chat.LastMessage && 
+            <Text style={styles.subTitle}>
             {dayjs(chat.LastMessage?.createdAt).fromNow(true)}
-          </Text>
+            </Text> 
+          }
+          
+
         </View>
         <Text numberOfLined={2} style={styles.message}>
           {chat.LastMessage?.text}

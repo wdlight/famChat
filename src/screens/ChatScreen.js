@@ -12,22 +12,38 @@ import InputBox from '../components/InputBox'
 import messages from '../../assets/data/messages.json'
 
 import { API, graphqlOperation } from 'aws-amplify'
-import { getChatRoom } from "../graphql/queries"
+import { getChatRoom, listMessagesByChatRoom } from "../graphql/queries"
 
 
 const ChatScreen = () => {
   const [ chatRoom, setChatRoom ] = useState(null);
-
+  const [ messages, setMessages ] = useState([]);
   const route = useRoute();
   console.log( route);
 
   const navigation = useNavigation();
   const chatRoomID = route.params.id;
   
+  //fetch Chat Rooom
   useEffect( ()=> {
+    console.log ( "+++++++++ fetch Chat Room CHat ROOM ID +++++++", chatRoomID)
     API.graphql( graphqlOperation( getChatRoom, {id: chatRoomID}))
       .then( result => setChatRoom( result.data?.getChatRoom))
-  },[])
+  },[chatRoomID])
+
+  // fetch Messages
+  useEffect( ()=> {
+    console.log ( "+++++++++ fetch Messages CHat ROOM ID +++++++", chatRoomID)
+    API.graphql( graphqlOperation( listMessagesByChatRoom, {
+        chatroomID: chatRoomID,
+        sortDirection: "DESC"
+    }))
+      .then( result => {
+        console.log ( "== == == == listMessagesByChatRoom",result.data?.listMessagesByChatRoom?.items )
+        setMessages( result.data?.listMessagesByChatRoom?.items )
+      })      
+  },[chatRoomID])
+
   useEffect ( ()=> {
     navigation.setOptions( {title: route.params.name});
   }, [route.params.name])
@@ -45,15 +61,16 @@ const ChatScreen = () => {
     keyboardVerticalOffset={Platform.OS === 'ios' ? 60 : 90}
     style={styles.bg}
     >
-    <ImageBackground source={bg} style={StyleSheet.bg}>
-      <FlatList
-        data={chatRoom.Messages.items}
-        renderItem={ ({item})=> <Message message={item}/>}
-        style={styles.list}
-        inverted
-      />
+      <ImageBackground source={bg} style={styles.bg}>
+        <FlatList
+          data={messages}
+          renderItem={ ({item})=> <Message message={item}/>}
+          style={styles.list}
+          inverted
+        />
+        
+      </ImageBackground>
       <InputBox chatroom={chatRoom}/>
-    </ImageBackground>
     </KeyboardAvoidingView>
   )
 }
@@ -66,7 +83,7 @@ const styles = StyleSheet.create( {
   },
   list: {
     padding: 10,
-    height: '91%'
+    height: '80%'
     
   }
 })

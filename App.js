@@ -25,8 +25,7 @@ function App() {
       const userData = await API.graphql( 
         graphqlOperation( getUser, { id: authUser.attributes.sub }))
             
-      if ( userData.data.getUser) {
-        console.log ( "User alerady exists in DB")
+      if ( userData.data.getUser) {        
         return;
       }
       // if there is no users in db, create one.
