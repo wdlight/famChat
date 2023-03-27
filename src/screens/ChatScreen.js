@@ -14,10 +14,14 @@ import messages from '../../assets/data/messages.json'
 import { API, graphqlOperation } from 'aws-amplify'
 import { getChatRoom, listMessagesByChatRoom } from "../graphql/queries"
 
+import { onCreateMessage, onUpdateChatRoom } from '../graphql/subscriptions';
+
 
 const ChatScreen = () => {
   const [ chatRoom, setChatRoom ] = useState(null);
   const [ messages, setMessages ] = useState([]);
+  
+
   const route = useRoute();
   console.log( route);
 
@@ -26,22 +30,49 @@ const ChatScreen = () => {
   
   //fetch Chat Rooom
   useEffect( ()=> {
-    console.log ( "+++++++++ fetch Chat Room CHat ROOM ID +++++++", chatRoomID)
+    
     API.graphql( graphqlOperation( getChatRoom, {id: chatRoomID}))
       .then( result => setChatRoom( result.data?.getChatRoom))
+
+    const subscription = API.graphql( graphqlOperation(
+      onUpdateChatRoom, { filter : { id: { eq: chatRoomID }}}
+    )).subscribe( {
+      next: ( {value} ) => {
+        console.log( "updated 999999999999999999999999");
+        console.log( value ? value : 'no value');
+        setChatRoom( cr => ( {
+           ...(cr||{}),
+           ...value.data.onUpdatedChatRoom,
+        }))
+      },
+      error: err => console.warn(err),
+        
+    })
+    return ()=>subscription.unsubscribe()
+
   },[chatRoomID])
 
   // fetch Messages
-  useEffect( ()=> {
-    console.log ( "+++++++++ fetch Messages CHat ROOM ID +++++++", chatRoomID)
+  useEffect( ()=> {    
     API.graphql( graphqlOperation( listMessagesByChatRoom, {
         chatroomID: chatRoomID,
         sortDirection: "DESC"
     }))
-      .then( result => {
-        console.log ( "== == == == listMessagesByChatRoom",result.data?.listMessagesByChatRoom?.items )
+      .then( result => {    
         setMessages( result.data?.listMessagesByChatRoom?.items )
       })      
+
+    // Subscribe to new messages
+    const subscription = API.graphql (
+      graphqlOperation ( onCreateMessage, { filter: {chatroomID : { "eq": chatRoomID}}})
+    ).subscribe( {
+      next: ({value}) => {        
+        setMessages(  m=> [ value.data.onCreateMessage, ...m])
+      },
+      error: (err) => console.warn(err),
+    })
+
+    return () => subscription.unsubscribe();
   },[chatRoomID])
 
   useEffect ( ()=> {
