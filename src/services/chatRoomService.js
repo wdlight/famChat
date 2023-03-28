@@ -15,7 +15,9 @@ export const getMyChatRooms = async ( userID) => {
   
   //get all chat room of user1ID
   const chatRoom = myChatRooms.find( (item) => {
-    return item.chatRoom.users.items.some(
+    return 
+      // item.chatRoom.users.items.length === 2 &&
+      item.chatRoom.users.items.some(
       (userItem) => userItem.user.id === userID )
   })
   // get all chat rooms of user2

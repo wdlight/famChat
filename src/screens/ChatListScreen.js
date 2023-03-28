@@ -32,7 +32,7 @@ const ChatListScreen = () => {
     setChatRooms( sortedRooms );
 
     console.log ( "::  🍎 ==> SortedRooms info")
-    console.log( sortedRooms.map( r => r.chatRoom.LastMessage.text));
+    console.log( sortedRooms.map( r => r.chatRoom?.LastMessage));
 
     setLoading( false);
   } 
@@ -46,8 +46,8 @@ const ChatListScreen = () => {
       data={chatRooms}
       renderItem={ ({item}) => {
         console.log ( "🍏🍏🍏🍏")
-        console.log ( item.chatRoom.LastMessage.text )
-        return <ChatListItem chat={item.chatRoom}/>
+        console.log ( item.chatRoom.LastMessage?.text )
+        // return <ChatListItem chat={item.chatRoom}/>
       } }
       style={{backgroundColor: 'white'}}
       refreshing={loading}

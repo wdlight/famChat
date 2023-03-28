@@ -37,18 +37,11 @@ const ChatScreen = () => {
     const subscription = API.graphql( graphqlOperation(
       onUpdateChatRoom, { filter : { id: { eq: chatRoomID }}}
     )).subscribe( {
-      next: ( {value} ) => {
-        console.log( "updated 999999999999999999999999");
-        console.log( value ? value : 'no value');
-        console.log( value ? value.data.onUpdateChatRoom : 'no value');
+      next: ( {value} ) => {        
         setChatRoom( cr => ( {
           ...(cr||{}),
           ...value.data.onUpdateChatRoom,
         }));
-        
-        console.log ( " 🟡🟡🟡🟡🟡🟡 ")
-        console.log( chatRoom);
-        console.log ( value.data.onUpdateChatRoom );
         
       },
       error: err => console.warn(err),

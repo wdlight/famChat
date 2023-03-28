@@ -16,6 +16,7 @@ const ChatListItem = ( {chat} ) => {
   useEffect( ()=>{    
     const fetchUsers = async () => {
       const authUser = await Auth.currentAuthenticatedUser();      
+      
       const userlist = chatRoom.users.items;      
       const userItem = userlist.find(
         (item) => item.user.id !== authUser.attributes.sub
