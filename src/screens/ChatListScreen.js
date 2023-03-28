@@ -30,19 +30,25 @@ const ChatListScreen = () => {
       return new Date(b.chatRoom.updatedAt) - new Date(a.chatRoom.updatedAt);
     });
     setChatRooms( sortedRooms );
+
+    console.log ( "::  🍎 ==> SortedRooms info")
+    console.log( sortedRooms.map( r => r.chatRoom.LastMessage.text));
+
     setLoading( false);
   } 
 
 
-  useEffect( ()=>{
-    
+  useEffect( ()=>{    
     fetchChatRooms();
-
   },[])
   return (
     <FlatList
       data={chatRooms}
-      renderItem={ ({item}) => <ChatListItem chat={item.chatRoom}/>}
+      renderItem={ ({item}) => {
+        console.log ( "🍏🍏🍏🍏")
+        console.log ( item.chatRoom.LastMessage.text )
+        return <ChatListItem chat={item.chatRoom}/>
+      } }
       style={{backgroundColor: 'white'}}
       refreshing={loading}
       onRefresh={ fetchChatRooms }
