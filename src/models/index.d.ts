@@ -54,6 +54,7 @@ type EagerMessage = {
   readonly text: string;
   readonly userID: string;
   readonly chatroomID: string;
+  readonly image?: (string | null)[] | null;
   readonly updatedAt?: string | null;
 }
 
@@ -67,6 +68,7 @@ type LazyMessage = {
   readonly text: string;
   readonly userID: string;
   readonly chatroomID: string;
+  readonly image?: (string | null)[] | null;
   readonly updatedAt?: string | null;
 }
 

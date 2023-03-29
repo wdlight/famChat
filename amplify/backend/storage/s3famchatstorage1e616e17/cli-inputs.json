@@ -1,0 +1,12 @@
+{
+  "resourceName": "s3famchatstorage1e616e17",
+  "bucketName": "famchat-storage-1e616e17",
+  "policyUUID": "7cbfc65c",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ]
+}
