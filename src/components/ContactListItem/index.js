@@ -9,7 +9,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
-const ContactListItem = ( {user, onPress=()=>{}, selectable = true, isSelect = true} ) => {
+const ContactListItem = ( {user, onPress=()=>{}, selectable = false, isSelected = false} ) => {
   const [loginUser, setLoginUser] = useState(null);
 
   useEffect(()=> {
@@ -29,21 +29,23 @@ const ContactListItem = ( {user, onPress=()=>{}, selectable = true, isSelect = t
   // const navigation = useNavigation(); 
 
   return (
-    <Pressable 
-      onPress={onPress} 
-      style={styles.container}>        
-      <Image 
-        style={styles.avatar}
-        source={{ uri: user.image }}        
-      />
+    <Pressable onPress={onPress} style={styles.container}>        
+      <Image style={styles.avatar} source={{ uri: user.image }}/>
+
       <View style={styles.content}>        
           <Text numberOfLines={1} style={styles.name}>
             { loginUser === user.id ? "MySelf" : user.name}
           </Text>          
-          <Text numberOfLines={1} style={styles.subTitle}>{user.status}</Text>          
-        
-        
+          <Text numberOfLines={1} style={styles.subTitle}>{user.status}</Text>
       </View>
+      {
+        selectable && (
+          isSelected ? 
+          <AntDesign name="checkcircle" style={{marginLeft: 'auto'}} size={24} color="royalblue"/>
+          :
+          <FontAwesome name="circle-thin" style={{marginLeft: 'auto'}} size={24} color="lightgray"/>
+        )
+      }
     </Pressable>
   )
 }
@@ -54,7 +56,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: 10,
     marginVertical: 5,
     height: 70,
-    alignItems: 'center'
+    alignItems: 'center',    
 
   },
   avatar: {

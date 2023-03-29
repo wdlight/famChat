@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 
 import { API, graphqlOperation } from "aws-amplify";
 import { onUpdateChatRoom } from "../graphql/subscriptions";
@@ -16,16 +16,28 @@ import ContactListItem from "../components/ContactListItem";
 
 const ChatRoomInfo = () => {
   const [chatRoom, setChatRoom] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [isUpdated, setIsUpdated] = useState(false); // Add state variable
+
   const route = useRoute();
+  const navigation = useNavigation();
 
   const chatroomID = route.params.id;
+  console.log ( "ChatroomID : 🐓🐓", chatroomID )
+
+  const fetchChatRoom = async () => {
+    setLoading(true);
+    const result = await API.graphql(
+      graphqlOperation(getChatRoom, { id: chatroomID })
+    );
+    setChatRoom(result.data?.getChatRoom);
+    console.log ( "fetchChatRoom -- 🍌🍌🍌🍌")
+    setLoading(false);
+  };
 
   useEffect(() => {
-    API.graphql(graphqlOperation(getChatRoom, { id: chatroomID })).then(
-      (result) => {
-        setChatRoom(result.data?.getChatRoom);
-      }
-    );
+    fetchChatRoom();
+
     // Subscribe to onUpdateChatRoom
     const subscription = API.graphql(
       graphqlOperation(onUpdateChatRoom, {
@@ -37,18 +49,22 @@ const ChatRoomInfo = () => {
           ...(cr || {}),
           ...value.data.onUpdateChatRoom,
         }));
+        console.log ( " 🍎🍎 : onUpdateChatRoom passing-- next: ")
       },
       error: (error) => console.warn(error),
     });
 
     // Stop receiving data updates from the subscription
     return () => subscription.unsubscribe();
-  }, [chatroomID]);
+  }, [chatroomID, isUpdated]);
+
+
 
   const removeChatRoomUser = async (chatRoomUser) => {
     await API.graphql( graphqlOperation( 
       deleteUserChatRoom, 
-      {input: { _version: chatRoomUser._version, id: chatRoomUser.id}}))
+      {input: { _version: chatRoomUser._version, id: chatRoomUser.id}}));
+    setIsUpdated((prev) => !prev)
   }
 
   const onContactPress = (chatRoomUser) => {
@@ -63,7 +79,9 @@ const ChatRoomInfo = () => {
         {
           text: "Remove",
           style: "destructive",
-          onPress: () => removeChatRoomUser(chatRoomUser)
+          onPress: () => {
+            removeChatRoomUser(chatRoomUser);
+          }
         },
       ]
     
@@ -73,17 +91,22 @@ const ChatRoomInfo = () => {
   if (!chatRoom) {
     return <ActivityIndicator />;
   }
+  
+  console.log ( "  🍊🍊🍊🍊users without deleted ..")
+  const users = chatRoom.Users.items.filter((item) => !item._deleted);
+  console.log ( " users without deleted .. 🍊🍊🍊🍊")
+  console.log ( users )
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Group name</Text>
+      <Text style={styles.title}>{chatRoom.name}</Text>
 
       <Text style={styles.sectionTitle}>
-        {chatRoom.Users.items.length} Participants
+        {users.length} Participants
       </Text>
       <View style={styles.section}>
         <FlatList
-          data={chatRoom.Users.items}
+          data={users}
           renderItem={({ item }) => (
             <ContactListItem user={item.user} onPress={()=>onContactPress(item)}
             />
@@ -124,8 +147,8 @@ export const getChatRoom = /* GraphQL */ `
       Users {
         items {
           id
-          chatRoomID
-          userID
+          chatRoomId
+          userId
           createdAt
           updatedAt
           _version

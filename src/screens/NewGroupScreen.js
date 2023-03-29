@@ -14,7 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 const NewGroupScreen = () => {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("")
-
   const [selectedUserIds, setSelectedUserIds] = useState([])
 
   const navigation = useNavigation();
@@ -22,6 +21,8 @@ const NewGroupScreen = () => {
   useEffect( () => {
     API.graphql( graphqlOperation(listUsers)).then( result =>{      
       setUsers( result.data?.listUsers?.items);
+      console.log ( " 🦸🦸🦸 NewGroupScreen -- set user data ")
+      console.log ( result.data?.listUsers?.items )
     })
   }, [])
 
@@ -29,9 +30,9 @@ const NewGroupScreen = () => {
     navigation.setOptions( {
       headerRight: () => (
         <Button title="Create" 
-        disabled={!name || selectedUserIds.length < 1} 
-        onPress={onCreateGroupPress}
-        selectable
+          disabled={!name || selectedUserIds.length < 1} 
+          onPress={onCreateGroupPress}
+          selectable
         ></Button>
       )
     })
@@ -61,8 +62,7 @@ const NewGroupScreen = () => {
     )
     
 
-    const authUser = await Auth.currentAuthenticatedUser();        
-    console.log("====createUserChatRoom >>>>>>22222222")
+    const authUser = await Auth.currentAuthenticatedUser();            
     await API.graphql( graphqlOperation( 
       createUserChatRoom, {
         input: { chatRoomId: newChatRoom.id, userId: authUser.attributes.sub }
@@ -89,7 +89,7 @@ const NewGroupScreen = () => {
     })
   }
 
-  console.log( JSON.stringify(chatRoom))
+  
   return (
     <View style={styles.container}>
       <TextInput
@@ -107,11 +107,10 @@ const NewGroupScreen = () => {
             user={item}
             selectable
             onPress={()=> onContactPress(item.id)}
-            isSelected={setSelectedUserIds.includes(item.id)}
+            isSelected={selectedUserIds.includes(item.id)}
 
           />
-        )}
-        style={{backgroundColor: 'white'}}        
+        )}        
       />
     </View>
 
