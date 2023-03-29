@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
+import { View, Text, StyleSheet, Image, Pressable, useWindowDimensions } from 'react-native'
 import React , { useState, useEffect } from 'react'
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -11,6 +11,8 @@ const Message = ({message}) => {
   const [isMe, setIsMe] = useState(false)
   const [imageSources, setImageSources] = useState([])
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
+
+  const { width } = useWindowDimensions();
 
   useEffect ( ()=> {
     const isMyMessage = async () => {
@@ -33,6 +35,8 @@ const Message = ({message}) => {
     downloadImages();
   },[message.image])
 
+  const imageContainerWidth = width * 0.8 - 30 ;
+
   return (
     <View 
       style={[styles.container, 
@@ -43,14 +47,22 @@ const Message = ({message}) => {
       ]}
     > 
       {imageSources.length > 0 && (
-        <>
+        <View style={[{ width: imageContainerWidth}, styles.images]}>
         {/* //  <S3Image imgKey={message.image[0]} style={styles.image} />  */}
         { imageSources.map( img => (
-          <Pressable onPress={()=> {               
-              setImageViewerVisible(true);}}>
-            <Image             
-              source={img} style={styles.image} /> 
-          </Pressable>
+          
+            <Pressable 
+              style={[
+                styles.imageContainer,
+                imageSources.length === 1 && {flex:1}
+              ]}            
+              onPress={()=> {               
+                setImageViewerVisible(true);}}>
+              <Image             
+                source={img} style={styles.image} /> 
+            </Pressable>
+          
+          
         ))}
         
 
@@ -60,7 +72,7 @@ const Message = ({message}) => {
           visible={imageViewerVisible}
           onRequestClose={()=> { setImageViewerVisible(false)}}
         />
-        </>      
+        </View>      
       )
       
       }
@@ -71,15 +83,13 @@ const Message = ({message}) => {
 }
 
 const styles = StyleSheet.create( {
-  container: {
-    
+  container: {    
     backgroundColor: 'white',
     alignSelf: 'flex-start',
     margin: 5,
     padding: 10,
     borderRadius: 10,
     maxWidth: '80%',
-
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
@@ -90,15 +100,27 @@ const styles = StyleSheet.create( {
     elevation: 5,
     
   },
+  
+
   time: {
       color: 'gray',
       alignSelf: 'flex-end',
   },
+  images: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    padding: 2,
+  },
+  imageContainer: {
+    width: '50%',
+    aspectRatio: 1,
+    border: 1,
+    padding: 3,
+  },
   image: {
-    width: 200,
-    height: 100,
+    flex: 1,
     borderColor: "white",
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: 5,
   }
 })
