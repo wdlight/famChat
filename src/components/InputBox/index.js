@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, Image } from 'react-native'
+import { View, Text, StyleSheet, TextInput, Image, FlatList } from 'react-native'
 import React from 'react'
 import { useState } from 'react'
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
@@ -9,11 +9,11 @@ import * as ImagePicker from 'expo-image-picker';
 
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from "uuid";
- 
+
 
 const InputBox = ({chatroom}) => {
   const [text, setText] = useState('');
-  const [image, setImage] = useState(null)
+  const [images, setImages] = useState([])
 
   /////////////////////////////////////
   // onSend message
@@ -27,18 +27,26 @@ const InputBox = ({chatroom}) => {
       userID: authUser.attributes.sub
     }    
 
-    if ( image) {
-      newMessage.image = [await uploadFiles(image)]; 
-      setImage(null);
+    if ( images ) {
+      try {
+        
+        console.log ( 'Upload start. =========', images )
+        newMessage.image = await Promise.all( images.map( img => uploadFiles(img) ));      
+        console.log ( 'Upload succes. 👍👍👍 ' )
+        console.log ( newMessage.image )
+      }
+      catch ( err) {
+        console.log ( 'Upload failed. ⚠️⚠️⚠️ ', err )
+      }
+
+      setImages([]);
     }
     const newMessageData = await API.graphql( graphqlOperation(
       createMessage, {input: newMessage} 
     ))
     
 
-    // set the new message as LastMessage of the ChatRoom
-    console.log ("000000000000000000000LASTMESSAGE return..========>>>>>>")
-    console.log ( newMessageData.data.createMessage.id)
+    // set the new message as LastMessage of the ChatRoom    
     const lastMsg  = await API.graphql( graphqlOperation 
       (
         updateChatRoom,
@@ -49,11 +57,7 @@ const InputBox = ({chatroom}) => {
             id: chatroom.id,
           }
         }
-      ))
-    console.log ("000000000000000000000LASTMESSAGE return..")
-    console.log ( lastMsg.data.updateChatRoom )
-    console.log ( text )
-    console.log ( newMessageData.data.createMessage.id )
+      ))    
     setText('');
   }
 
@@ -62,20 +66,35 @@ const InputBox = ({chatroom}) => {
       //mediaTypes: ImagePicker.MediaTypeOptions.All,
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,    // loading image quality .. size 변화?
+      allowsMultipleSelection: true,
     })
-    console.log ( "Image 🍎🍎🍎🍎 Result. ")
+    
     console.log ( result );
 
 
-    if ( !result.canceled ) {
-      console.log ( "Image 🍎🍎🍎🍎 Result. accepted.. ", result.assets[0].uri, result.uri);
-      setImage ( result.assets[0].uri);
+    if ( !result.canceled  ) {
+
+      console.log ( "🍌🍌🍌🍌🍌 -- result.selected check.. print result.");
+      console.log ( result )
+      
+      if ( result.assets ){
+        setImages( result?.assets.map( asset => asset.uri))
+        console.log ( "Image 🍎🍎🍎🍎 Result. accepted.. ", result?.assets.map( asset => asset.uri) );
+      }
+        
+      // }
+      // else {
+      //   setImages ( [result.assets[0].uri]);
+      //   console.log ( "Image 🍎🍎🍎🍎 Result. accepted.. ", result.assets );
+      // }
+      
+      
     }
   }
 
   const uploadFiles = async (fileUri) => {
     try {
-      const response = await fetch( fileUri);
+      const response = await fetch( fileUri );
       const blob = await response.blob();
       const key = `${uuidv4()}.png`;
       await Storage.put( key, blob, {
@@ -83,25 +102,40 @@ const InputBox = ({chatroom}) => {
       });
       return key;
     } catch(err){
-      console.log ( "Error uploading files:", err)
+      console.log ( "Error uploading files: 🔴🔴🔴", err)
     }
-
   }
 
+  console.log ( "🍌🍌🍌🍌🍌")
+  console.log ( images )
   return (
     <>
     {
-      image && (
+      images && (
         <View style={StyleSheet.attachmentsContainer}>  
-          <Image source = {{ uri: image}} style={styles.selectedImage} resizeMode="contain"/>
-
-          <MaterialIcons
-            name="highlight-remove"
-            onPress={()=> setImage(null)}  
-            size={20}
-            color="gray"
-            style={styles.removeSelectedImage}
-          />
+          <FlatList
+            data = {images}
+            horizontal
+            renderItem={ ({item})=>(
+              <>
+              <Image 
+                key={item}
+                source = {{uri: item}} 
+                style={styles.selectedImage} 
+                resizeMode="contain"/>
+              <MaterialIcons
+                name="highlight-remove"
+                onPress={ ()=> 
+                    setImages( (existingImages)=> existingImages.filter((img)=> img !== item) 
+                )}  
+                size={20}
+                color="gray"
+                style={styles.removeSelectedImage}
+              />
+              </>
+            )}
+          ></FlatList>
+          
 
             
         </View>

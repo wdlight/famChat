@@ -1,12 +1,17 @@
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native'
 import React , { useState, useEffect } from 'react'
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Auth } from 'aws-amplify'
-import {S3Image} from 'aws-amplify-react-native'
+import { Auth, Storage } from 'aws-amplify';
+import {S3Image} from 'aws-amplify-react-native';
+import ImageView from 'react-native-image-viewing';
+
 
 const Message = ({message}) => {
   const [isMe, setIsMe] = useState(false)
+  const [imageSources, setImageSources] = useState([])
+  const [imageViewerVisible, setImageViewerVisible] = useState(false);
+
   useEffect ( ()=> {
     const isMyMessage = async () => {
       const authUser = await Auth.currentAuthenticatedUser();      
@@ -16,17 +21,49 @@ const Message = ({message}) => {
     isMyMessage();
   }, [])
   
+  useEffect( ()=> {
+    const downloadImages = async () => {
+      console.log ( "🍌🍌🍌🍌🍌")
+      console.log ( message.image )
+      if ( message.image?.length > 0 ){        
+        const uris = await Promise.all( message.image.map( Storage.get) );
+        setImageSources( uris?.map( (uri)=>({uri}) ) );
+      }
+    }
+    downloadImages();
+  },[message.image])
 
   return (
     <View 
-    style={[styles.container, 
-      {
-        backgroundColor: isMe ? '#DCF8C5' : 'white',
-        alignSelf: isMe ? 'flex-end' : 'flex-start'
-      }
-    ]}
+      style={[styles.container, 
+        {
+          backgroundColor: isMe ? '#DCF8C5' : 'white',
+          alignSelf: isMe ? 'flex-end' : 'flex-start'
+        }
+      ]}
     > 
-      {message.image?.length > 0 && <S3Image imgKey={message.image[0]} style={styles.image} /> }
+      {imageSources.length > 0 && (
+        <>
+        {/* //  <S3Image imgKey={message.image[0]} style={styles.image} />  */}
+        { imageSources.map( img => (
+          <Pressable onPress={()=> {               
+              setImageViewerVisible(true);}}>
+            <Image             
+              source={img} style={styles.image} /> 
+          </Pressable>
+        ))}
+        
+
+        <ImageView
+          images={imageSources}
+          imageIndex={0}
+          visible={imageViewerVisible}
+          onRequestClose={()=> { setImageViewerVisible(false)}}
+        />
+        </>      
+      )
+      
+      }
       <Text>{message.text}</Text>
       <Text style={styles.time}>{dayjs(message.createdAt).fromNow(true)}</Text>
     </View>
