@@ -40,8 +40,8 @@ export const schema = {
                         ]
                     }
                 },
-                "users": {
-                    "name": "users",
+                "Users": {
+                    "name": "Users",
                     "isArray": true,
                     "type": {
                         "model": "UserChatRoom"
@@ -147,15 +147,15 @@ export const schema = {
                     "isRequired": true,
                     "attributes": []
                 },
-                "chatroomID": {
-                    "name": "chatroomID",
+                "userID": {
+                    "name": "userID",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": true,
                     "attributes": []
                 },
-                "userID": {
-                    "name": "userID",
+                "chatroomID": {
+                    "name": "chatroomID",
                     "isArray": false,
                     "type": "ID",
                     "isRequired": true,
@@ -180,20 +180,20 @@ export const schema = {
                 {
                     "type": "key",
                     "properties": {
-                        "name": "byChatRoom",
-                        "queryField": "listMessagesByChatRoom",
+                        "name": "byUser",
                         "fields": [
-                            "chatroomID",
-                            "createdAt"
+                            "userID"
                         ]
                     }
                 },
                 {
                     "type": "key",
                     "properties": {
-                        "name": "byUser",
+                        "name": "byChatRoom",
+                        "queryField": "listMessagesByChatRoom",
                         "fields": [
-                            "userID"
+                            "chatroomID",
+                            "createdAt"
                         ]
                     }
                 },
@@ -422,5 +422,5 @@ export const schema = {
     "enums": {},
     "nonModels": {},
     "codegenVersion": "3.4.0",
-    "version": "add7d90c4191482561e22f3a9cfcb6fc"
+    "version": "de897828335177d69463b889e71b8f48"
 };

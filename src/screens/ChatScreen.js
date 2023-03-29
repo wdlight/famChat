@@ -16,6 +16,7 @@ import { getChatRoom, listMessagesByChatRoom } from "../graphql/queries"
 
 import { onCreateMessage, onUpdateChatRoom } from '../graphql/subscriptions';
 
+import { Feather } from "@expo/vector-icons"
 
 const ChatScreen = () => {
   const [ chatRoom, setChatRoom ] = useState(null);
@@ -30,9 +31,14 @@ const ChatScreen = () => {
   
   //fetch Chat Rooom
   useEffect( ()=> {
-    
+    console.log ( "getChatROOM 🍎 : 🤠")
+    console.log ( chatRoomID )
     API.graphql( graphqlOperation( getChatRoom, {id: chatRoomID}))
       .then( result => setChatRoom( result.data?.getChatRoom))
+
+      
+      console.log ( "getChatROOM 🍎 : 🤠")
+    
 
     const subscription = API.graphql( graphqlOperation(
       onUpdateChatRoom, { filter : { id: { eq: chatRoomID }}}
@@ -53,6 +59,7 @@ const ChatScreen = () => {
 
   // fetch Messages
   useEffect( ()=> {    
+    console.log ( "listMessagesByChatRoom🍎 : 🤠")
     API.graphql( graphqlOperation( listMessagesByChatRoom, {
         chatroomID: chatRoomID,
         sortDirection: "DESC"
@@ -75,12 +82,23 @@ const ChatScreen = () => {
   },[chatRoomID])
 
   useEffect ( ()=> {
-    navigation.setOptions( {title: route.params.name});
+    console.log ( "navigation SetOption. : 🤠")
+    navigation.setOptions( {
+      title: route.params.name, 
+      headerRight: () => (
+        <Feather 
+          name="more-vertical" 
+          size={24} color="gray"
+          onPress = { ()=> navigation.navigate( "Group Info", { id: chatRoomID })}
+        />
+      )
+    });
   }, [route.params.name])
 
   
 
   if ( !chatRoom) {
+    console.log ( "no chat room 🍄")
     return <ActivityIndicator />;
   }
   
@@ -109,7 +127,7 @@ const ChatScreen = () => {
 const styles = StyleSheet.create( {
   bg: {
     flex: 1,    
-    backgroundColor: 'red',
+    backgroundColor: 'whitesmoke',
   },
   list: {
     padding: 10,

@@ -1,23 +1,32 @@
 import { View, Image, Text, StyleSheet, Pressable } from 'react-native'
-import {useNavigation} from '@react-navigation/native';
-
+import { useNavigation} from '@react-navigation/native';
+import { Auth } from 'aws-amplify'
 import { AntDesign, FontAwesome} from "@expo/vector-icons";
+import React, {useState, useEffect } from 'react'
 
-import React from 'react';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-
-
-
 dayjs.extend(relativeTime);
 
-
-
 const ContactListItem = ( {user, onPress=()=>{}, selectable = true, isSelect = true} ) => {
+  const [loginUser, setLoginUser] = useState(null);
 
-  const navigation = useNavigation(); 
-  
+  useEffect(()=> {
+
+    const fetchLoginUser = async () => {
+      try {
+        const authUser = await Auth.currentAuthenticatedUser();
+        setLoginUser(authUser.attributes.sub);        
+      } catch (error) {
+        console.log("Error fetching login user:", error);
+      }
+    };
+    fetchLoginUser();
+
+  },[])
+
+  // const navigation = useNavigation(); 
 
   return (
     <Pressable 
@@ -27,9 +36,10 @@ const ContactListItem = ( {user, onPress=()=>{}, selectable = true, isSelect = t
         style={styles.avatar}
         source={{ uri: user.image }}        
       />
-      <View style={styles.content}>
-        
-          <Text numberOfLines={1} style={styles.name}>{user.name}</Text>          
+      <View style={styles.content}>        
+          <Text numberOfLines={1} style={styles.name}>
+            { loginUser === user.id ? "MySelf" : user.name}
+          </Text>          
           <Text numberOfLines={1} style={styles.subTitle}>{user.status}</Text>          
         
         

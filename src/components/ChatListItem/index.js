@@ -16,8 +16,8 @@ const ChatListItem = ( {chat} ) => {
   useEffect( ()=>{    
     const fetchUsers = async () => {
       const authUser = await Auth.currentAuthenticatedUser();      
-      
-      const userlist = chatRoom.users.items;      
+
+      const userlist = chatRoom.Users.items;      
       const userItem = userlist.find(
         (item) => item.user.id !== authUser.attributes.sub
       )
@@ -65,7 +65,9 @@ const ChatListItem = ( {chat} ) => {
       />
       <View style={styles.content}>
         <View style={styles.row}>
-          <Text numberOfLines={1} style={styles.name}>{user?.name}</Text>
+          <Text numberOfLines={1} style={styles.name}>
+            { chatRoom.name || user?.name}
+          </Text>
           
           { chatRoom.LastMessage && 
             <Text style={styles.subTitle}>

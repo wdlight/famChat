@@ -12,8 +12,8 @@ export const getChatRoom = /* GraphQL */ `
           id
           createdAt
           text
-          chatroomID
           userID
+          chatroomID
           updatedAt
           _version
           _deleted
@@ -22,7 +22,7 @@ export const getChatRoom = /* GraphQL */ `
         nextToken
         startedAt
       }
-      users {
+      Users {
         items {
           id
           chatRoomId
@@ -40,8 +40,8 @@ export const getChatRoom = /* GraphQL */ `
         id
         createdAt
         text
-        chatroomID
         userID
+        chatroomID
         updatedAt
         _version
         _deleted
@@ -71,7 +71,7 @@ export const listChatRooms = /* GraphQL */ `
           nextToken
           startedAt
         }
-        users {
+        Users {
           nextToken
           startedAt
         }
@@ -79,8 +79,8 @@ export const listChatRooms = /* GraphQL */ `
           id
           createdAt
           text
-          chatroomID
           userID
+          chatroomID
           updatedAt
           _version
           _deleted
@@ -119,7 +119,7 @@ export const syncChatRooms = /* GraphQL */ `
           nextToken
           startedAt
         }
-        users {
+        Users {
           nextToken
           startedAt
         }
@@ -127,8 +127,8 @@ export const syncChatRooms = /* GraphQL */ `
           id
           createdAt
           text
-          chatroomID
           userID
+          chatroomID
           updatedAt
           _version
           _deleted
@@ -152,8 +152,8 @@ export const getMessage = /* GraphQL */ `
       id
       createdAt
       text
-      chatroomID
       userID
+      chatroomID
       updatedAt
       _version
       _deleted
@@ -172,8 +172,8 @@ export const listMessages = /* GraphQL */ `
         id
         createdAt
         text
-        chatroomID
         userID
+        chatroomID
         updatedAt
         _version
         _deleted
@@ -201,8 +201,39 @@ export const syncMessages = /* GraphQL */ `
         id
         createdAt
         text
-        chatroomID
         userID
+        chatroomID
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;
+export const messagesByUserID = /* GraphQL */ `
+  query MessagesByUserID(
+    $userID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelMessageFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    messagesByUserID(
+      userID: $userID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        createdAt
+        text
+        userID
+        chatroomID
         updatedAt
         _version
         _deleted
@@ -234,39 +265,8 @@ export const listMessagesByChatRoom = /* GraphQL */ `
         id
         createdAt
         text
-        chatroomID
         userID
-        updatedAt
-        _version
-        _deleted
-        _lastChangedAt
-      }
-      nextToken
-      startedAt
-    }
-  }
-`;
-export const messagesByUserID = /* GraphQL */ `
-  query MessagesByUserID(
-    $userID: ID!
-    $sortDirection: ModelSortDirection
-    $filter: ModelMessageFilterInput
-    $limit: Int
-    $nextToken: String
-  ) {
-    messagesByUserID(
-      userID: $userID
-      sortDirection: $sortDirection
-      filter: $filter
-      limit: $limit
-      nextToken: $nextToken
-    ) {
-      items {
-        id
-        createdAt
-        text
         chatroomID
-        userID
         updatedAt
         _version
         _deleted
@@ -289,8 +289,8 @@ export const getUser = /* GraphQL */ `
           id
           createdAt
           text
-          chatroomID
           userID
+          chatroomID
           updatedAt
           _version
           _deleted
@@ -403,7 +403,7 @@ export const getUserChatRoom = /* GraphQL */ `
           nextToken
           startedAt
         }
-        users {
+        Users {
           nextToken
           startedAt
         }
@@ -411,8 +411,8 @@ export const getUserChatRoom = /* GraphQL */ `
           id
           createdAt
           text
-          chatroomID
           userID
+          chatroomID
           updatedAt
           _version
           _deleted

@@ -42,7 +42,7 @@ const NewGroupScreen = () => {
     
     // Create a new Chatroom
     const newChatRoomData = await API.graphql( graphqlOperation(
-      createChatRoom, { input : {}}
+      createChatRoom, { input : { name }}
     ))  
     if (!newChatRoomData.data?.createChatRoom) {
       console.log("Error creating the chat error");
@@ -67,6 +67,9 @@ const NewGroupScreen = () => {
       createUserChatRoom, {
         input: { chatRoomId: newChatRoom.id, userId: authUser.attributes.sub }
     }))
+
+    setSelectedUserIds([]);
+    setName("")
     // Add the clicked user to the Chat Room
     navigation.navigate( "Chat", {id: newChatRoom.id});
       

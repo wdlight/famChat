@@ -1,5 +1,6 @@
 
 import React from "react";
+import { View, Alert, ToastAndroid } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ChatListScreen from "../screens/ChatListScreen";
 import ContactsScreen from "../screens/ContactsScreen";
@@ -55,7 +56,15 @@ const MainTabNavigator = () => {
           headerRight: () => (
             <Entypo
               name="new-message"
-              onPress={() => navigation.navigate("Contacts")}
+              onPress={() => { 
+                // Alert.alert("nav to Contacts!!" ,
+                //   'Message',
+                //   [{text: 'Cancel',onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                //     { text: 'OK', onPress: () => console.log('OK Pressed') }
+                //   ]
+                //   )
+                navigation.navigate("Contacts")
+              }}
               size={18}
               color={"royalblue"}
               style={{ marginRight: 15 }}

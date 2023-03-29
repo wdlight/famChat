@@ -15,7 +15,7 @@ type EagerChatRoom = {
   readonly name?: string | null;
   readonly image?: string | null;
   readonly Messages?: (Message | null)[] | null;
-  readonly users?: (UserChatRoom | null)[] | null;
+  readonly Users?: (UserChatRoom | null)[] | null;
   readonly LastMessage?: Message | null;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -31,7 +31,7 @@ type LazyChatRoom = {
   readonly name?: string | null;
   readonly image?: string | null;
   readonly Messages: AsyncCollection<Message>;
-  readonly users: AsyncCollection<UserChatRoom>;
+  readonly Users: AsyncCollection<UserChatRoom>;
   readonly LastMessage: AsyncItem<Message | undefined>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
@@ -52,8 +52,8 @@ type EagerMessage = {
   readonly id: string;
   readonly createdAt: string;
   readonly text: string;
-  readonly chatroomID: string;
   readonly userID: string;
+  readonly chatroomID: string;
   readonly updatedAt?: string | null;
 }
 
@@ -65,8 +65,8 @@ type LazyMessage = {
   readonly id: string;
   readonly createdAt: string;
   readonly text: string;
-  readonly chatroomID: string;
   readonly userID: string;
+  readonly chatroomID: string;
   readonly updatedAt?: string | null;
 }
 
