@@ -4,11 +4,12 @@ export const listChatRooms = /* GraphQL */ `
       id
       ChatRooms {
         items {
+          _deleted
           chatRoom {
             id
             updatedAt
             name
-            image
+            image            
             Users {
               items {
                 user {

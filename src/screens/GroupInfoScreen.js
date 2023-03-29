@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import {
   StyleSheet,
   FlatList,
-  View,
+  View, ScrollView,
   Text,
   ActivityIndicator,
   Alert,
@@ -34,6 +34,17 @@ const ChatRoomInfo = () => {
     console.log ( "fetchChatRoom -- 🍌🍌🍌🍌")
     setLoading(false);
   };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      setLoading(true);
+      fetchChatRoom().then((data) => {        
+        setLoading(false);
+      });
+    });
+    return unsubscribe;
+  }, [navigation]);
+
 
   useEffect(() => {
     fetchChatRoom();
@@ -79,12 +90,9 @@ const ChatRoomInfo = () => {
         {
           text: "Remove",
           style: "destructive",
-          onPress: () => {
-            removeChatRoomUser(chatRoomUser);
-          }
+          onPress: () => removeChatRoomUser(chatRoomUser)          
         },
-      ]
-    
+      ]    
     );
   }
 
@@ -92,25 +100,38 @@ const ChatRoomInfo = () => {
     return <ActivityIndicator />;
   }
   
-  console.log ( "  🍊🍊🍊🍊users without deleted ..")
   const users = chatRoom.Users.items.filter((item) => !item._deleted);
-  console.log ( " users without deleted .. 🍊🍊🍊🍊")
-  console.log ( users )
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{chatRoom.name}</Text>
 
-      <Text style={styles.sectionTitle}>
-        {users.length} Participants
-      </Text>
+      <View style={{ 
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <Text style={styles.sectionTitle}>{users.length} Participants</Text>
+        <Text 
+          onPress = {()=>{ navigation.navigate("Add Contacts", { chatRoom, onInviteFriends: fetchChatRoom})}}
+          style={{ fontWeight: 'bold', color: 'royalblue'}}
+        >          
+          Invite friends
+        </Text>
+      </View>
+      
+
       <View style={styles.section}>
         <FlatList
           data={users}
           renderItem={({ item }) => (
-            <ContactListItem user={item.user} onPress={()=>onContactPress(item)}
+            <ContactListItem 
+              user={item.user} 
+              onPress={()=>onContactPress(item)}
             />
           )}
+          onRefresh={fetchChatRoom}    
+          refreshing={loading}
+          style={{ height: '90%' }}
         />
       </View>
     </View>

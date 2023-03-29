@@ -15,15 +15,16 @@ const ChatListScreen = () => {
   const fetchChatRooms = async() => {
     setLoading( true);
     
-    const authUser = await Auth.currentAuthenticatedUser();
+    const authUser = await Auth.currentAuthenticatedUser();    
     
-    console.log ( "🍎🍎🍎🍎" + authUser.attributes.sub )
     const response = await API.graphql(
       graphqlOperation( listChatRooms, { id: authUser.attributes.sub })
     );
     
-    const rooms = response?.data?.getUser?.ChatRooms?.items;
-    console.log ( rooms )
+    const rooms = response?.data?.getUser?.ChatRooms?.items.filter( item => !item._deleted );
+    console.log ( ": 🍎🍎🍎🍎", rooms.length )
+    console.log ( response?.data?.getUser?.ChatRooms?.items.map( i => i._deleted) )
+
     const sortedRooms = rooms.
       sort((a, b) => {
         if (!a.chatRoom || !b.chatRoom) {
@@ -32,9 +33,6 @@ const ChatListScreen = () => {
         return new Date(b.chatRoom.updatedAt) - new Date(a.chatRoom.updatedAt);
       });
     setChatRooms( sortedRooms );
-
-    console.log ( "::  🍎 ==> SortedRooms info")
-    console.log( sortedRooms.map( r => r.chatRoom?.LastMessage));
 
     setLoading( false); 
   } 
@@ -46,9 +44,7 @@ const ChatListScreen = () => {
   return (
     <FlatList
       data={chatRooms}
-      renderItem={ ({item}) => {
-        console.log ( "🍏🍏🍏🍏🍏=ChatScreen: rendering.")
-        console.log ( item.chatRoom.LastMessage?.text )
+      renderItem={ ({item}) => {        
         return <ChatListItem chat={item.chatRoom}/>
       } }
       style={{backgroundColor: 'white'}}
