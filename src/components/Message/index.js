@@ -5,7 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { Auth, Storage } from 'aws-amplify';
 import {S3Image} from 'aws-amplify-react-native';
 import ImageView from 'react-native-image-viewing';
-
+import { Video } from "expo-av";
 
 const Message = ({message}) => {
   const [isMe, setIsMe] = useState(false)  
@@ -42,7 +42,7 @@ const Message = ({message}) => {
     downloadAttachments();
   },[JSON.stringify(message.Attachments.items)])
 
-  const imageContainerWidth = width * 0.8 - 30 ;
+  const maxContainerWidth = width * 0.8 - 30 ;
     
   return (
     <View 
@@ -54,11 +54,11 @@ const Message = ({message}) => {
       ]}
     > 
       {downloadedAttachments.length > 0 && (
-        <View style={[{ width: imageContainerWidth}, styles.images]}>
+        <View style={[{ width: maxContainerWidth}, styles.images]}>
         {/* //  <S3Image imgKey={message.image[0]} style={styles.image} />  */}
-        { downloadedAttachments.map( img => (          
+        { downloadedAttachments.map( attachment => attachment.type ==='IMAGE'? (          
             <Pressable 
-              key={img.uri} 
+              key={attachment.uri} 
               style={[
                 styles.imageContainer,
                 downloadedAttachments.length === 1 && {flex:1}
@@ -66,11 +66,24 @@ const Message = ({message}) => {
               onPress={()=> {               
                 setImageViewerVisible(true);}}>
               <Image             
-                source={ {uri: img.uri}} style={styles.image} /> 
+                source={ {uri: attachment.uri}} style={styles.image} /> 
             </Pressable>
-          
-          
-        ))}
+        ) : (
+            <Video
+              useNativeControls
+              source = {{ uri: attachment.uri}}
+              shouldPlay={false}
+              style={{
+                width: maxContainerWidth,
+                height:
+                  (attachment.height * maxContainerWidth) / attachment.width,
+              }}
+              resizeMode="contain"
+            />            
+        )
+        
+        
+        )}
         
 
         <ImageView
