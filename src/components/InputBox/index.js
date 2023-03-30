@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { AntDesign, MaterialIcons } from '@expo/vector-icons'
 import { SafeAreaView} from 'react-native-safe-area-context';
 import { API, graphqlOperation, Auth, Storage} from 'aws-amplify';
-import { createMessage, updateChatRoom } from '../../graphql/mutations';
+import { createMessage, updateChatRoom, createAttachment } from '../../graphql/mutations';
 import * as ImagePicker from 'expo-image-picker';
 
 import "react-native-get-random-values";
@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const InputBox = ({chatroom}) => {
   const [text, setText] = useState('');
-  const [images, setImages] = useState([])
+  const [files, setFiles] = useState([])
 
   /////////////////////////////////////
   // onSend message
@@ -27,30 +27,20 @@ const InputBox = ({chatroom}) => {
       userID: authUser.attributes.sub
     }    
 
-    if ( images ) {
-      try {
-        
-        console.log ( 'Upload start. =========', images )
-        newMessage.image = await Promise.all( images.map( img => uploadFiles(img) ));      
-        console.log ( 'Upload succes. 👍👍👍 ' )
-        console.log ( newMessage.image )
-      }
-      catch ( err) {
-        console.log ( 'Upload failed. ⚠️⚠️⚠️ ', err )
-      }
-
-      setImages([]);
-    }
-    const newMessageData = await API.graphql( graphqlOperation(
-      createMessage, {input: newMessage} 
-    ))
     
+    // save the message
+    const newMessageData = await API.graphql( 
+      graphqlOperation( createMessage, {input: newMessage} )
+    )
+
+    //create attachment.
+    await Promise.all( files.map( file => 
+      addAttachment( file, newMessageData.data.createMessage.id)))
+    setFiles([]);
 
     // set the new message as LastMessage of the ChatRoom    
-    const lastMsg  = await API.graphql( graphqlOperation 
-      (
-        updateChatRoom,
-        {
+    await API.graphql( 
+      graphqlOperation (updateChatRoom, {
           input : {
             _version: chatroom._version ,
             chatRoomLastMessageId: newMessageData.data.createMessage.id,
@@ -59,6 +49,24 @@ const InputBox = ({chatroom}) => {
         }
       ))    
     setText('');
+  }
+
+  const addAttachment = async ( file, messageID )=> {
+    console.log ( " 🔴🔴: newAttachment ==> check newAttachment of file == uploading file.uri ⭐⭐")
+    console.log ( file )
+    const newAttachment = {
+      storageKey: await uploadFiles(file.uri),
+      type: "IMAGE", // make 'ALL' for VIDEOs.
+
+      width: file.width,
+      height: file.height,
+      duration: file.duration,
+      messageID,
+      chatroomID: chatroom.id
+    }
+    console.log ( " : newAttachment ==> check newAttachment of file🔴🔴")
+    console.log ( newAttachment );
+    return API.graphql( graphqlOperation(createAttachment, {input: newAttachment} ))
   }
 
   const pickImage = async () => {
@@ -71,62 +79,78 @@ const InputBox = ({chatroom}) => {
     
     console.log ( result );
 
-
     if ( !result.canceled  ) {
-
-      console.log ( "🍌🍌🍌🍌🍌 -- result.selected check.. print result.");
+      console.log ( "🍌🍌🍌🍌🍌 -- result.assets check.. printing result.");
       console.log ( result )
       
       if ( result.assets ){
-        setImages( result?.assets.map( asset => asset.uri))
-        console.log ( "Image 🍎🍎🍎🍎 Result. accepted.. ", result?.assets.map( asset => asset.uri) );
+        //setFiles( result?.assets.map( asset => asset.uri))
+        setFiles( result.assets )
+        console.log ( "setFiles Setting 🍎🍎🍎🍎 Result. accepted.. ", 
+                    result.assets );
       }
-        
-      // }
-      // else {
-      //   setImages ( [result.assets[0].uri]);
-      //   console.log ( "Image 🍎🍎🍎🍎 Result. accepted.. ", result.assets );
-      // }
-      
       
     }
   }
 
-  const uploadFiles = async (fileUri) => {
+  const uploadFiles = async (fileUrl) => {
     try {
-      const response = await fetch( fileUri );
+      let contentType = "";
+      let extension = "";
+      if (fileUrl.endsWith(".png")) {
+        contentType = "image/png";
+        extension = ".png";
+      } else if (fileUrl.endsWith(".jpg") || fileUrl.endsWith(".jpeg")) {
+        contentType = "image/jpeg";
+        extension = ".jpg";
+      } else if (fileUrl.endsWith(".gif")) {
+        contentType = "image/gif";
+        extension = ".gif";
+      } else if (fileUrl.endsWith(".svg")) {
+        contentType = "image/svg+xml";
+        extension = ".svg";
+      } else if (fileUrl.endsWith(".pdf")) {
+        contentType = "application/pdf";
+        extension = ".pdf";
+      } else {
+        console.log("Unsupported file type");
+        return null;
+      }
+      const response = await fetch(fileUrl);
       const blob = await response.blob();
-      const key = `${uuidv4()}.png`;
-      await Storage.put( key, blob, {
-        contentType: "image/png",
+      const key = `${uuidv4()}${extension}`;
+      await Storage.put(key, blob, {
+        contentType: contentType,
       });
       return key;
-    } catch(err){
-      console.log ( "Error uploading files: 🔴🔴🔴", err)
+    } catch (err) {
+      console.log("Error uploading files: 🔴🔴🔴", err);
+      return null;
     }
-  }
+  };
+  
 
-  console.log ( "🍌🍌🍌🍌🍌")
-  console.log ( images )
+  console.log ( "🍌🍌🍌🍌🍌 [files before return..")
+  console.log ( files )
   return (
     <>
     {
-      images && (
+      files && (
         <View style={StyleSheet.attachmentsContainer}>  
           <FlatList
-            data = {images}
+            data = {files}
             horizontal
             renderItem={ ({item})=>(
               <>
               <Image 
                 key={item}
-                source = {{uri: item}} 
+                source = {{uri: item.uri}} 
                 style={styles.selectedImage} 
                 resizeMode="contain"/>
               <MaterialIcons
                 name="highlight-remove"
                 onPress={ ()=> 
-                    setImages( (existingImages)=> existingImages.filter((img)=> img !== item) 
+                    setFiles( (existingFiles)=> existingFiles.filter((file)=> file !== item) 
                 )}  
                 size={20}
                 color="gray"

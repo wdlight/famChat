@@ -12,7 +12,8 @@ import InputBox from '../components/InputBox'
 import messages from '../../assets/data/messages.json'
 
 import { API, graphqlOperation } from 'aws-amplify'
-import { getChatRoom, listMessagesByChatRoom } from "../graphql/queries"
+import { getChatRoom } from "../graphql/queries"
+import {  listMessagesByChatRoom } from "../graphql/customQueries"
 
 import { onCreateMessage, onUpdateChatRoom } from '../graphql/subscriptions';
 
@@ -97,11 +98,10 @@ const ChatScreen = () => {
 
   
 
-  if ( !chatRoom) {
-    console.log ( "no chat room 🍄")
+  if ( !chatRoom) {  
     return <ActivityIndicator />;
   }
-  
+  console.log ( messages )
   
 
   return (

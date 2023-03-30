@@ -17,6 +17,9 @@
       },
       "api": {
         "famChat": {}
+      },
+      "storage": {
+        "s3famchatstorage1e616e17": {}
       }
     }
   }

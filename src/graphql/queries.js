@@ -1,6 +1,155 @@
 /* eslint-disable */
 // this is an auto generated file. This will be overwritten
 
+export const getAttachment = /* GraphQL */ `
+  query GetAttachment($id: ID!) {
+    getAttachment(id: $id) {
+      id
+      storageKey
+      type
+      width
+      height
+      duration
+      messageID
+      chatroomID
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+    }
+  }
+`;
+export const listAttachments = /* GraphQL */ `
+  query ListAttachments(
+    $filter: ModelAttachmentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listAttachments(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        storageKey
+        type
+        width
+        height
+        duration
+        messageID
+        chatroomID
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;
+export const syncAttachments = /* GraphQL */ `
+  query SyncAttachments(
+    $filter: ModelAttachmentFilterInput
+    $limit: Int
+    $nextToken: String
+    $lastSync: AWSTimestamp
+  ) {
+    syncAttachments(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      lastSync: $lastSync
+    ) {
+      items {
+        id
+        storageKey
+        type
+        width
+        height
+        duration
+        messageID
+        chatroomID
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;
+export const attachmentsByMessageID = /* GraphQL */ `
+  query AttachmentsByMessageID(
+    $messageID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelAttachmentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    attachmentsByMessageID(
+      messageID: $messageID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        storageKey
+        type
+        width
+        height
+        duration
+        messageID
+        chatroomID
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;
+export const attachmentsByChatroomID = /* GraphQL */ `
+  query AttachmentsByChatroomID(
+    $chatroomID: ID!
+    $sortDirection: ModelSortDirection
+    $filter: ModelAttachmentFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    attachmentsByChatroomID(
+      chatroomID: $chatroomID
+      sortDirection: $sortDirection
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+    ) {
+      items {
+        id
+        storageKey
+        type
+        width
+        height
+        duration
+        messageID
+        chatroomID
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+      }
+      nextToken
+      startedAt
+    }
+  }
+`;
 export const getChatRoom = /* GraphQL */ `
   query GetChatRoom($id: ID!) {
     getChatRoom(id: $id) {
@@ -44,10 +193,33 @@ export const getChatRoom = /* GraphQL */ `
         userID
         chatroomID
         image
+        Attachments {
+          nextToken
+          startedAt
+        }
         updatedAt
         _version
         _deleted
         _lastChangedAt
+      }
+      Attachments {
+        items {
+          id
+          storageKey
+          type
+          width
+          height
+          duration
+          messageID
+          chatroomID
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
+        nextToken
+        startedAt
       }
       createdAt
       updatedAt
@@ -88,6 +260,10 @@ export const listChatRooms = /* GraphQL */ `
           _version
           _deleted
           _lastChangedAt
+        }
+        Attachments {
+          nextToken
+          startedAt
         }
         createdAt
         updatedAt
@@ -138,6 +314,10 @@ export const syncChatRooms = /* GraphQL */ `
           _deleted
           _lastChangedAt
         }
+        Attachments {
+          nextToken
+          startedAt
+        }
         createdAt
         updatedAt
         _version
@@ -159,6 +339,25 @@ export const getMessage = /* GraphQL */ `
       userID
       chatroomID
       image
+      Attachments {
+        items {
+          id
+          storageKey
+          type
+          width
+          height
+          duration
+          messageID
+          chatroomID
+          createdAt
+          updatedAt
+          _version
+          _deleted
+          _lastChangedAt
+        }
+        nextToken
+        startedAt
+      }
       updatedAt
       _version
       _deleted
@@ -180,6 +379,10 @@ export const listMessages = /* GraphQL */ `
         userID
         chatroomID
         image
+        Attachments {
+          nextToken
+          startedAt
+        }
         updatedAt
         _version
         _deleted
@@ -210,6 +413,10 @@ export const syncMessages = /* GraphQL */ `
         userID
         chatroomID
         image
+        Attachments {
+          nextToken
+          startedAt
+        }
         updatedAt
         _version
         _deleted
@@ -242,6 +449,10 @@ export const messagesByUserID = /* GraphQL */ `
         userID
         chatroomID
         image
+        Attachments {
+          nextToken
+          startedAt
+        }
         updatedAt
         _version
         _deleted
@@ -276,6 +487,10 @@ export const listMessagesByChatRoom = /* GraphQL */ `
         userID
         chatroomID
         image
+        Attachments {
+          nextToken
+          startedAt
+        }
         updatedAt
         _version
         _deleted
@@ -428,6 +643,10 @@ export const getUserChatRoom = /* GraphQL */ `
           _version
           _deleted
           _lastChangedAt
+        }
+        Attachments {
+          nextToken
+          startedAt
         }
         createdAt
         updatedAt

@@ -8,10 +8,10 @@ import ImageView from 'react-native-image-viewing';
 
 
 const Message = ({message}) => {
-  const [isMe, setIsMe] = useState(false)
-  const [imageSources, setImageSources] = useState([])
+  const [isMe, setIsMe] = useState(false)  
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
-
+  const [downloadedAttachments, setDownloadedAttachments] = useState([])
+  
   const { width } = useWindowDimensions();
 
   useEffect ( ()=> {
@@ -24,19 +24,26 @@ const Message = ({message}) => {
   }, [])
   
   useEffect( ()=> {
-    const downloadImages = async () => {
-      console.log ( "🍌🍌🍌🍌🍌")
-      console.log ( message.image )
-      if ( message.image?.length > 0 ){        
-        const uris = await Promise.all( message.image.map( Storage.get) );
-        setImageSources( uris?.map( (uri)=>({uri}) ) );
+    const downloadAttachments = async () => {
+      console.log ( "⬇️-- downloadAttachment Start ⬇️⬇️ : message.Attachments")
+      console.log ( message.Attachments )
+      if ( message.Attachments.items ){        
+        const downloadedAttachments = await Promise.all (
+          message.Attachments.items.map ( (attachment) => 
+            Storage.get( attachment.storageKey ).then ( uri => ({
+              ...attachment,
+              uri,
+            }))
+          )
+        );
+        setDownloadedAttachments(downloadedAttachments ) ;        
       }
     }
-    downloadImages();
-  },[message.image])
+    downloadAttachments();
+  },[message.Attachments.items])
 
   const imageContainerWidth = width * 0.8 - 30 ;
-
+  
   return (
     <View 
       style={[styles.container, 
@@ -46,20 +53,20 @@ const Message = ({message}) => {
         }
       ]}
     > 
-      {imageSources.length > 0 && (
+      {downloadedAttachments.length > 0 && (
         <View style={[{ width: imageContainerWidth}, styles.images]}>
         {/* //  <S3Image imgKey={message.image[0]} style={styles.image} />  */}
-        { imageSources.map( img => (
-          
+        { downloadedAttachments.map( img => (          
             <Pressable 
+              key={img.uri} 
               style={[
                 styles.imageContainer,
-                imageSources.length === 1 && {flex:1}
+                downloadedAttachments.length === 1 && {flex:1}
               ]}            
               onPress={()=> {               
                 setImageViewerVisible(true);}}>
               <Image             
-                source={img} style={styles.image} /> 
+                source={ {uri: img.uri}} style={styles.image} /> 
             </Pressable>
           
           
@@ -67,7 +74,7 @@ const Message = ({message}) => {
         
 
         <ImageView
-          images={imageSources}
+          images={downloadedAttachments.map( ({uri}) => ({uri}))}
           imageIndex={0}
           visible={imageViewerVisible}
           onRequestClose={()=> { setImageViewerVisible(false)}}
