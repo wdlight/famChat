@@ -7,6 +7,9 @@ import {S3Image} from 'aws-amplify-react-native';
 import ImageView from 'react-native-image-viewing';
 import { Video } from "expo-av";
 
+import ImageAttachment from './ImageAttachment';
+
+import VideoAttachment from './VideoAttachment';
 const Message = ({message}) => {
   const [isMe, setIsMe] = useState(false)  
   const [imageViewerVisible, setImageViewerVisible] = useState(false);
@@ -44,7 +47,15 @@ const Message = ({message}) => {
 
   const maxContainerWidth = width * 0.8 - 30 ;
     
+  const imageAttachments = downloadedAttachments.filter(
+    (at) => at.type === "IMAGE"
+  );
+  const videoAttachments = downloadedAttachments.filter(
+    (at) => at.type === "VIDEO"
+  );
+
   return (
+    
     <View 
       style={[styles.container, 
         {
@@ -55,50 +66,21 @@ const Message = ({message}) => {
     > 
       {downloadedAttachments.length > 0 && (
         <View style={[{ width: maxContainerWidth}, styles.images]}>
-        {/* //  <S3Image imgKey={message.image[0]} style={styles.image} />  */}
-        { downloadedAttachments.map( attachment => attachment.type ==='IMAGE'? (          
-            <Pressable 
-              key={attachment.uri} 
-              style={[
-                styles.imageContainer,
-                downloadedAttachments.length === 1 && {flex:1}
-              ]}            
-              onPress={()=> {               
-                setImageViewerVisible(true);}}>
-              <Image             
-                source={ {uri: attachment.uri}} style={styles.image} /> 
-            </Pressable>
-        ) : (
-            <Video
-              useNativeControls
-              source = {{ uri: attachment.uri}}
-              shouldPlay={false}
-              style={{
-                width: maxContainerWidth,
-                height:
-                  (attachment.height * maxContainerWidth) / attachment.width,
-              }}
-              resizeMode="contain"
-            />            
-        )
-        
-        
-        )}
-        
+          <ImageAttachment 
+            attachments={imageAttachments}/>
 
-        <ImageView
-          images={downloadedAttachments.map( ({uri}) => ({uri}))}
-          imageIndex={0}
-          visible={imageViewerVisible}
-          onRequestClose={()=> { setImageViewerVisible(false)}}
-        />
-        </View>      
-      )
+          <VideoAttachment 
+              width={maxContainerWidth} 
+              attachments={videoAttachments}/>
+        </View>
+      )}
       
-      }
       <Text>{message.text}</Text>
       <Text style={styles.time}>{dayjs(message.createdAt).fromNow(true)}</Text>
     </View>
+
+    
+    
   )
 }
 
