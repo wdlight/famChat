@@ -62,10 +62,15 @@ const InputBox = ({chatroom}) => {
     console.log ( " ⭐⭐: newAttachment ==> check newAttachment of file == uploading file.uri ⭐⭐")
     console.log ( file );
 
+    const types= {
+      image: 'IMAGE',
+      video: 'VIDEO',
+    }
+
     try {
       const newAttachment = {
         storageKey: await uploadFiles(file.uri),
-        type: "IMAGE", // make 'ALL' for VIDEOs.
+        type: types[file.type], // make 'ALL' for VIDEOs.
   
         width: file.width,
         height: file.height,
