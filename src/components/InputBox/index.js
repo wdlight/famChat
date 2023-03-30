@@ -17,7 +17,8 @@ import uuid from 'react-native-uuid';
 const InputBox = ({chatroom}) => {
   
   const [text, setText] = useState('');
-  const [files, setFiles] = useState([])
+  const [files, setFiles] = useState([]);
+  const [progresses, setProgresses] = useState( []);
 
   // const { v4: uuidv4 } = require('uuid');
 
@@ -147,6 +148,12 @@ const InputBox = ({chatroom}) => {
 
       await Storage.put(key, blob, {
         contentType: contentType,
+        progressCallback: (progress) => {
+          console.log ( `progress: ${progress.loaded}/${progress.totla}`);
+          setProgresses ( p => ({...p, 
+                [fileUrl]: ((progress.loaded/progress.total) *100).toFixed(0)
+              }));
+        }
       });
       console.log ( " 📗📗📗📗 upload completed", key)
 
@@ -173,6 +180,18 @@ const InputBox = ({chatroom}) => {
                 source = {{uri: item.uri}} 
                 style={styles.selectedImage} 
                 resizeMode="contain"/>
+
+                
+                {progresses[item.uri] && (
+                  <View style={{position: "absolute", top: "45%", left: "45%", backgroundColor: "#8c8c8cAA", padding: 5, borderRadius: 50}}>
+                    <Text style={{ color: "white", fontWeight: "bold"}}>
+                      {progresses[item.uri]}%
+                    </Text>
+                  </View>
+                  
+                )}
+                
+
               <MaterialIcons
                 name="highlight-remove"
                 onPress={ ()=> 
