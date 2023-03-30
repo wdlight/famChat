@@ -7,13 +7,19 @@ import { API, graphqlOperation, Auth, Storage} from 'aws-amplify';
 import { createMessage, updateChatRoom, createAttachment } from '../../graphql/mutations';
 import * as ImagePicker from 'expo-image-picker';
 
-import "react-native-get-random-values";
-import { v4 as uuidv4 } from "uuid";
+// import "react-native-get-random-values";
+// import uuid from "uuid";
+import uuid from 'react-native-uuid'; 
+
+
 
 
 const InputBox = ({chatroom}) => {
+  
   const [text, setText] = useState('');
   const [files, setFiles] = useState([])
+
+  // const { v4: uuidv4 } = require('uuid');
 
   /////////////////////////////////////
   // onSend message
@@ -36,6 +42,7 @@ const InputBox = ({chatroom}) => {
     //create attachment.
     await Promise.all( files.map( file => 
       addAttachment( file, newMessageData.data.createMessage.id)))
+
     setFiles([]);
 
     // set the new message as LastMessage of the ChatRoom    
@@ -52,21 +59,30 @@ const InputBox = ({chatroom}) => {
   }
 
   const addAttachment = async ( file, messageID )=> {
-    console.log ( " 🔴🔴: newAttachment ==> check newAttachment of file == uploading file.uri ⭐⭐")
-    console.log ( file )
-    const newAttachment = {
-      storageKey: await uploadFiles(file.uri),
-      type: "IMAGE", // make 'ALL' for VIDEOs.
+    console.log ( " ⭐⭐: newAttachment ==> check newAttachment of file == uploading file.uri ⭐⭐")
+    console.log ( file );
 
-      width: file.width,
-      height: file.height,
-      duration: file.duration,
-      messageID,
-      chatroomID: chatroom.id
+    try {
+      const newAttachment = {
+        storageKey: await uploadFiles(file.uri),
+        type: "IMAGE", // make 'ALL' for VIDEOs.
+  
+        width: file.width,
+        height: file.height,
+        duration: file.duration,
+        messageID,
+        chatroomID: chatroom.id
+      }
+      console.log ( " : newAttachment ==> check newAttachment of file🟡🟡")
+      console.log ( newAttachment );
+
+      return API.graphql( graphqlOperation(createAttachment, {input: newAttachment} ))
     }
-    console.log ( " : newAttachment ==> check newAttachment of file🔴🔴")
-    console.log ( newAttachment );
-    return API.graphql( graphqlOperation(createAttachment, {input: newAttachment} ))
+    catch ( err ) {
+      console.log ( "addAttachemnt() Error ❌❌", err);
+      Alert.alert( "Uploading Fails!!");
+      return;
+    } 
   }
 
   const pickImage = async () => {
@@ -77,6 +93,7 @@ const InputBox = ({chatroom}) => {
       allowsMultipleSelection: true,
     })
     
+    console.log ( "SELECT Images 🟡🟡🟡 check reesult format if multiple selection support.")
     console.log ( result );
 
     if ( !result.canceled  ) {
@@ -86,8 +103,7 @@ const InputBox = ({chatroom}) => {
       if ( result.assets ){
         //setFiles( result?.assets.map( asset => asset.uri))
         setFiles( result.assets )
-        console.log ( "setFiles Setting 🍎🍎🍎🍎 Result. accepted.. ", 
-                    result.assets );
+        console.log ( "setFiles at pickImages 🍏🍏🍏 Result. accepted.. ", result.assets );
       }
       
     }
@@ -118,10 +134,17 @@ const InputBox = ({chatroom}) => {
       }
       const response = await fetch(fileUrl);
       const blob = await response.blob();
-      const key = `${uuidv4()}${extension}`;
+
+      console.log ( " 📗📗📗📗 trying uuid() ")
+      // const random_uuid = uuidv4();      
+      const random_uuid = uuid.v4();
+      const key = random_uuid + extension;
+
       await Storage.put(key, blob, {
         contentType: contentType,
       });
+      console.log ( " 📗📗📗📗 upload completed", key)
+
       return key;
     } catch (err) {
       console.log("Error uploading files: 🔴🔴🔴", err);
@@ -130,8 +153,6 @@ const InputBox = ({chatroom}) => {
   };
   
 
-  console.log ( "🍌🍌🍌🍌🍌 [files before return..")
-  console.log ( files )
   return (
     <>
     {

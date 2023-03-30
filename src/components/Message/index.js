@@ -40,10 +40,10 @@ const Message = ({message}) => {
       }
     }
     downloadAttachments();
-  },[message.Attachments.items])
+  },[JSON.stringify(message.Attachments.items)])
 
   const imageContainerWidth = width * 0.8 - 30 ;
-  
+    
   return (
     <View 
       style={[styles.container, 
