@@ -109,7 +109,10 @@ const ChatScreen = () => {
     });
 
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      subscriptionAttachments.unsubscribe();
+    }
   },[chatRoomID])
 
   useEffect ( ()=> {
@@ -124,7 +127,7 @@ const ChatScreen = () => {
         />
       )
     });
-  }, [route.params.name])
+  }, [route.params.name], chatRoomID)
 
   
 
@@ -146,9 +149,9 @@ const ChatScreen = () => {
           style={styles.list}
           inverted
         />
-        
+        <InputBox chatroom={chatRoom}/>  
       </ImageBackground>
-      <InputBox chatroom={chatRoom}/>
+      
     </KeyboardAvoidingView>
   )
 }

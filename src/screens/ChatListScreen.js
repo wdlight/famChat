@@ -26,13 +26,12 @@ const ChatListScreen = () => {
     console.log ( response?.data?.getUser?.ChatRooms?.items.map( i => i._deleted) )
 
     const sortedRooms = rooms.
-      sort((a, b) => {
-        if (!a.chatRoom || !b.chatRoom) {
-          return 0; // if chatRoom property is not present, return 0
-        }
+      sort((a, b) => {        
         return new Date(b.chatRoom.updatedAt) - new Date(a.chatRoom.updatedAt);
       });
     setChatRooms( sortedRooms );
+    
+    console.log ( ": 🔴🔴 : sorted Rooms", sortedRooms.map( r => r.chatRoom.updatedAt) );
 
     setLoading( false); 
   } 
